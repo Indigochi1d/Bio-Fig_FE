@@ -20,7 +20,7 @@ ChartJS.register(
   Tooltip,
   Legend
 );
-
+//Plugins..
 const errorBarPlugin = {
   id: "errorBarPlugin",
   afterDatasetsDraw(chart) {
@@ -55,13 +55,45 @@ const errorBarPlugin = {
     });
   },
 };
+
+const customXYLinePlugin = {
+  id: 'customXYLinePlugin',
+  afterDraw(chart) {
+    const { ctx, chartArea: { top, bottom, left, right } } = chart;
+
+    // X 축
+    ctx.save();
+    ctx.beginPath();
+    ctx.lineWidth = 4;
+    ctx.strokeStyle = 'black';
+    ctx.moveTo(left, bottom);
+    ctx.lineTo(right, bottom);
+    ctx.stroke();
+    ctx.restore();
+
+    // Y 축
+    ctx.save();
+    ctx.beginPath();
+    ctx.lineWidth = 4;
+    ctx.strokeStyle = 'black';
+    ctx.moveTo(left, top);
+    ctx.lineTo(left, bottom);
+    ctx.stroke();
+    ctx.restore();
+  }
+};
+
+//Register 부분
 ChartJS.register(errorBarPlugin);
+ChartJS.register(customXYLinePlugin);
+
+
 
 function addOffsetToSameYValues(data) {
   const yValueCount = {};
   const OFFSET_STEP = 0.05;
 
-  data.forEach(point => {
+  data.forEach((point) => {
     if (!yValueCount[point.y]) {
       yValueCount[point.y] = { count: 0, offset: 0 };
     }
@@ -101,12 +133,12 @@ export default function ScatterWithBars() {
           { x: 2, y: 8 },
           { x: 3, y: 10 },
         ],
-        backgroundColor: ["#FFE772", "#EE3C2C", "#1FA39F", "#FDB461"],
-        borderColor: "rgb(0,0,0)",
+        backgroundColor: ["#8998fa", "#F69F91", "#A8E19B", "#FDB461"],
+        borderColor: "#000000",
         borderWidth: 5,
         error: [30, 30, 30, 30],
         barPercentage: 0.4,
-        categoryPercentage: 0.8
+        categoryPercentage: 0.8,
       },
     ],
   };
