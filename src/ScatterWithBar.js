@@ -11,6 +11,7 @@ import {
   Legend,
 } from "chart.js";
 import { useLocation } from "react-router-dom";
+import { errorBarPlugin, customXYLinePlugin,customGridLinePlugin } from "./plugins/Plugins.js";
 
 ChartJS.register(
   CategoryScale,
@@ -21,75 +22,8 @@ ChartJS.register(
   Tooltip,
   Legend
 );
-//Plugins..
-const errorBarPlugin = {
-  id: "errorBarPlugin",
-  afterDatasetsDraw(chart) {
-    const { ctx } = chart;
-    chart.data.datasets.forEach((dataset, datasetIndex) => {
-      if (dataset.type === "bar" && dataset.error) {
-        const meta = chart.getDatasetMeta(datasetIndex);
-        meta.data.forEach((bar, index) => {
-          const error = dataset.error[index];
-          const xPos = bar.x;
-          const errorTop = bar.y - error;
-          const errorBottom = bar.y + error;
-          // 에러 바 그리기
-          ctx.save();
-          ctx.strokeStyle = "black";
-          ctx.lineWidth = 4;
-          ctx.beginPath();
-          ctx.moveTo(xPos, errorTop);
-          ctx.lineTo(xPos, errorBottom);
-          ctx.stroke();
-
-          // 에러 바 끝부분의 캡 그리기
-          ctx.beginPath();
-          ctx.moveTo(xPos - 8, errorTop);
-          ctx.lineTo(xPos + 8, errorTop);
-          ctx.moveTo(xPos - 8, errorBottom);
-          ctx.lineTo(xPos + 8, errorBottom);
-          ctx.stroke();
-          ctx.restore();
-        });
-      }
-    });
-  },
-};
-
-const customXYLinePlugin = {
-  id: "customXYLinePlugin",
-  afterDraw(chart) {
-    const {
-      ctx,
-      chartArea: { top, bottom, left, right },
-    } = chart;
-
-    // X 축
-    ctx.save();
-    ctx.beginPath();
-    ctx.lineWidth = 4;
-    ctx.strokeStyle = "black";
-    ctx.moveTo(left, bottom);
-    ctx.lineTo(right, bottom);
-    ctx.stroke();
-    ctx.restore();
-
-    // Y 축
-    ctx.save();
-    ctx.beginPath();
-    ctx.lineWidth = 4;
-    ctx.strokeStyle = "black";
-    ctx.moveTo(left, top);
-    ctx.lineTo(left, bottom);
-    ctx.stroke();
-    ctx.restore();
-  },
-};
-
-//Register 부분
-ChartJS.register(errorBarPlugin);
-ChartJS.register(customXYLinePlugin);
+//Custom Plugin Register 부분
+ChartJS.register(errorBarPlugin,customXYLinePlugin,customGridLinePlugin);
 
 function addOffsetToSameYValues(data) {
   const xyValueCount = {};
@@ -107,7 +41,6 @@ function addOffsetToSameYValues(data) {
   return data;
 }
 
-
 function calculateBarData(savedData) {
   const groupedData = savedData.reduce((acc, { x, y }) => {
     if (!acc[x]) {
@@ -123,14 +56,44 @@ function calculateBarData(savedData) {
   }));
 }
 
+function calculateStandardDeviation(datas) {
+  const ObjtoArrayDatas = datas.reduce((newArrayData, { x, y }) => {
+    if (!newArrayData[x]) {
+      newArrayData[x] = [];
+    }
+    newArrayData[x].push(y);
+    return newArrayData;
+  }, {});
+
+  const arrayData = Object.keys(ObjtoArrayDatas).map(
+    (key) => ObjtoArrayDatas[key]
+  );
+
+  function stdDev(arr) {
+    if (arr.length === 0) return 0;
+
+    const mean = arr.reduce((acc, val) => acc + val, 0) / arr.length;
+    const variance =
+      arr.reduce((acc, val) => acc + Math.pow(val - mean, 2), 0) / arr.length;
+    return Math.sqrt(variance);
+  }
+  // 각 내부 배열의 표준편차를 계산
+  const stdDevs = arrayData.map((innerArray) => stdDev(innerArray));
+
+  return stdDevs;
+}
+
 export default function ScatterWithBars() {
   const location = useLocation();
   const { savedData } = location.state || {};
   const scatterData = savedData;
+  console.log(scatterData[0].y);
   const barData = calculateBarData(savedData);
   const columnsLabel = location.state.columns;
   const Xtitle = location.state.Xtitle;
   const Ytitle = location.state.Ytitle;
+  const StandardDeviationWithSavedData = calculateStandardDeviation(savedData);
+  console.log(StandardDeviationWithSavedData);
   const data = {
     datasets: [
       {
@@ -147,7 +110,7 @@ export default function ScatterWithBars() {
         backgroundColor: ["#8998fa", "#F69F91", "#A8E19B", "#FDB461"],
         borderColor: "#000000",
         borderWidth: 5,
-        error: [30, 30, 30, 30],
+        error: StandardDeviationWithSavedData,
         barPercentage: 0.4,
         categoryPercentage: 0.8,
       },
@@ -175,6 +138,7 @@ export default function ScatterWithBars() {
           callback: function (value) {
             return columnsLabel[value] || "";
           },
+          padding:18,
         },
         title: {
           display: true,
@@ -200,6 +164,7 @@ export default function ScatterWithBars() {
             size: 20,
           },
           color: "black",
+          padding:15,
         },
         title: {
           display: true,
