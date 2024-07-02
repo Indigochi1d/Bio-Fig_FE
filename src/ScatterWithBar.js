@@ -11,7 +11,11 @@ import {
   Legend,
 } from "chart.js";
 import { useLocation } from "react-router-dom";
-import { errorBarPlugin, customXYLinePlugin,customGridLinePlugin } from "./plugins/Plugins.js";
+import {
+  errorBarPlugin,
+  customXYLinePlugin,
+  customGridLinePlugin,
+} from "./plugins/Plugins.js";
 
 ChartJS.register(
   CategoryScale,
@@ -23,7 +27,7 @@ ChartJS.register(
   Legend
 );
 //Custom Plugin Register 부분
-ChartJS.register(errorBarPlugin,customXYLinePlugin,customGridLinePlugin);
+ChartJS.register(errorBarPlugin, customXYLinePlugin, customGridLinePlugin);
 
 function addOffsetToSameYValues(data) {
   const xyValueCount = {};
@@ -56,29 +60,26 @@ function calculateBarData(savedData) {
   }));
 }
 
+//표본 표준편차
 function calculateStandardDeviation(datas) {
-  const ObjtoArrayDatas = datas.reduce((newArrayData, { x, y }) => {
-    if (!newArrayData[x]) {
-      newArrayData[x] = [];
+  const groupedData = datas.reduce((acc, { x, y }) => {
+    if (!acc[x]) {
+      acc[x] = [];
     }
-    newArrayData[x].push(y);
-    return newArrayData;
+    acc[x].push(y);
+    return acc;
   }, {});
 
-  const arrayData = Object.keys(ObjtoArrayDatas).map(
-    (key) => ObjtoArrayDatas[key]
-  );
+  const arrayData = Object.values(groupedData);
 
   function stdDev(arr) {
     if (arr.length === 0) return 0;
-
     const mean = arr.reduce((acc, val) => acc + val, 0) / arr.length;
-    const variance =
-      arr.reduce((acc, val) => acc + Math.pow(val - mean, 2), 0) / arr.length;
+    const variance = arr.reduce((acc, val) => acc + Math.pow(val - mean, 2), 0) / (arr.length - 1);
     return Math.sqrt(variance);
   }
-  // 각 내부 배열의 표준편차를 계산
-  const stdDevs = arrayData.map((innerArray) => stdDev(innerArray));
+
+  const stdDevs = arrayData.map(innerArray => stdDev(innerArray));
 
   return stdDevs;
 }
@@ -87,7 +88,6 @@ export default function ScatterWithBars() {
   const location = useLocation();
   const { savedData } = location.state || {};
   const scatterData = savedData;
-  console.log(scatterData[0].y);
   const barData = calculateBarData(savedData);
   const columnsLabel = location.state.columns;
   const Xtitle = location.state.Xtitle;
@@ -138,7 +138,7 @@ export default function ScatterWithBars() {
           callback: function (value) {
             return columnsLabel[value] || "";
           },
-          padding:18,
+          padding: 18,
         },
         title: {
           display: true,
@@ -164,7 +164,7 @@ export default function ScatterWithBars() {
             size: 20,
           },
           color: "black",
-          padding:15,
+          padding: 15,
         },
         title: {
           display: true,

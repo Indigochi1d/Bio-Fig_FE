@@ -9,12 +9,14 @@ export const errorBarPlugin = {
         meta.data.forEach((bar, index) => {
           const error = dataset.error[index];
           const xPos = bar.x;
-          const errorTop = bar.y - error;
-          const errorBottom = bar.y + error;
+          const errorTop = bar.y - error*20;
+          const errorBottom = bar.y + error*20;
+          console.log("Error Top:", errorTop);
+          console.log("Error Bottom:", errorBottom);
           // 에러 바 그리기
           ctx.save();
           ctx.strokeStyle = "black";
-          ctx.lineWidth = 4;
+          ctx.lineWidth = 3;
           ctx.beginPath();
           ctx.moveTo(xPos, errorTop);
           ctx.lineTo(xPos, errorBottom);
@@ -91,12 +93,11 @@ export const customGridLinePlugin = {
     for (let i = x.min; i <= x.max; i += xStepSize) {
       const xPos = x.getPixelForValue(i);
       ctx.beginPath();
-      ctx.moveTo(xPos,bottom);
-      ctx.lineTo(xPos,bottom+20);
+      ctx.moveTo(xPos, bottom);
+      ctx.lineTo(xPos, bottom + 20);
       ctx.stroke();
     }
-      
-      
+
     ctx.restore();
   },
 };
