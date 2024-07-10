@@ -24,8 +24,12 @@ const Container = styled.div`
 `;
 
 const ChartWrapper = styled.div`
-  width: 768px; 
+  width: 768px;
   height: 100%;
 `;
 
 export default App;
+
+/*
+test
+*/
