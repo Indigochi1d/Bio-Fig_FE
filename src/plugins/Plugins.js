@@ -11,8 +11,6 @@ export const errorBarPlugin = {
           const xPos = bar.x;
           const errorTop = bar.y - error*20;
           const errorBottom = bar.y + error*20;
-          console.log("Error Top:", errorTop);
-          console.log("Error Bottom:", errorBottom);
           // 에러 바 그리기
           ctx.save();
           ctx.strokeStyle = "black";

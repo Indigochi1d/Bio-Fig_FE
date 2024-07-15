@@ -95,7 +95,6 @@ export default function ScatterWithBars() {
   const Xtitle = location.state.Xtitle;
   const Ytitle = location.state.Ytitle;
   const StandardDeviationWithSavedData = calculateStandardDeviation(savedData);
-  console.log(StandardDeviationWithSavedData);
   const data = {
     datasets: [
       {
