@@ -1,5 +1,5 @@
 import styled from "styled-components";
-import ScatterWithBars from "../../ScatterWithBar";
+import ScatterWithBars from "../../components/graphs/ScatterWithBar.js";
 
 const StyledScatterWithBarsPage = styled.div`
   display: flex;

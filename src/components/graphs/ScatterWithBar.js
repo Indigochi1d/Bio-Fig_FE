@@ -15,7 +15,7 @@ import {
   errorBarPlugin,
   customXYLinePlugin,
   customGridLinePlugin,
-} from "../../plugins/Plugins.js";
+} from "../../plugins/Plugins";
 
 ChartJS.register(
   CategoryScale,
@@ -75,13 +75,11 @@ function calculateStandardDeviation(datas) {
   function stdDev(arr) {
     if (arr.length === 0) return 0;
     const mean = arr.reduce((acc, val) => acc + val, 0) / arr.length;
-    const variance =
-      arr.reduce((acc, val) => acc + Math.pow(val - mean, 2), 0) /
-      (arr.length - 1);
+    const variance = arr.reduce((acc, val) => acc + Math.pow(val - mean, 2), 0) / (arr.length - 1);
     return Math.sqrt(variance);
   }
 
-  const stdDevs = arrayData.map((innerArray) => stdDev(innerArray));
+  const stdDevs = arrayData.map(innerArray => stdDev(innerArray));
 
   return stdDevs;
 }
@@ -95,6 +93,7 @@ export default function ScatterWithBars() {
   const Xtitle = location.state.Xtitle;
   const Ytitle = location.state.Ytitle;
   const StandardDeviationWithSavedData = calculateStandardDeviation(savedData);
+  console.log(barData);
   const data = {
     datasets: [
       {
@@ -112,8 +111,8 @@ export default function ScatterWithBars() {
         borderColor: "#000000",
         borderWidth: 5,
         error: StandardDeviationWithSavedData,
-        barPercentage: 0.8,
-        categoryPercentage: 0.7,
+        barPercentage: 0.4,
+        categoryPercentage: 0.8,
       },
     ],
   };
@@ -121,7 +120,6 @@ export default function ScatterWithBars() {
   const options = {
     scales: {
       x: {
-        responive: false,
         type: "linear",
         position: "bottom",
         grid: {
@@ -183,10 +181,5 @@ export default function ScatterWithBars() {
     },
   };
 
-  return (
-    <Scatter
-      data={data}
-      options={options}
-    />
-  );
+  return <Scatter data={data} options={options} />;
 }
