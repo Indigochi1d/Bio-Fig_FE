@@ -2,8 +2,8 @@ import React from "react";
 import ReactDOM from "react-dom/client";
 import "./index.css";
 import { createBrowserRouter,  RouterProvider } from "react-router-dom";
-import SpreadSheet from "./SpreadSheet..js";
 import ScatterWithBarsPage from "./pages/graphs/ScatterWithBarsPage.js";
+import SpreadSheetPage from "./pages/spreadsheet/SpreadSheetPage.js";
 const router = createBrowserRouter([
   {
     path:'/scatter-bar-plot',
@@ -11,7 +11,7 @@ const router = createBrowserRouter([
   },
   {
     path:'/',
-    element:<SpreadSheet/>
+    element:<SpreadSheetPage/>
   }
 ])
 const root = ReactDOM.createRoot(document.getElementById("root"));
