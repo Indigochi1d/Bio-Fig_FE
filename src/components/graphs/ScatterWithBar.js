@@ -16,7 +16,11 @@ import {
   customXYLinePlugin,
   customGridLinePlugin,
 } from "../../lib/plugins/Plugins";
-import { BarWithErrorBar, BarWithErrorBarsChart, BarWithErrorBarsController } from "chartjs-chart-error-bars";
+import {
+  BarWithErrorBar,
+  BarWithErrorBarsChart,
+  BarWithErrorBarsController,
+} from "chartjs-chart-error-bars";
 
 ChartJS.register(
   CategoryScale,
@@ -39,17 +43,17 @@ function addOffsetToSameYValuesPerBar(scatterData, barYData) {
   const POINT_RADIUS = 1; // 스캐터 점의 반지름
 
   barYData.forEach((bar) => {
-    const filteredData = scatterData.filter(point => point.x === bar.x);
+    const filteredData = scatterData.filter((point) => point.x === bar.x);
 
     // y 값의 중복 여부를 확인
-    const yValues = filteredData.map(point => point.y);
+    const yValues = filteredData.map((point) => point.y);
     const hasDuplicates = new Set(yValues).size !== yValues.length;
 
     if (hasDuplicates) {
-      const offsetStart = bar.x - (OFFSET_STEP * (filteredData.length - 1) / 2);
+      const offsetStart = bar.x - (OFFSET_STEP * (filteredData.length - 1)) / 2;
 
       filteredData.forEach((point, index) => {
-        point.x = offsetStart + (OFFSET_STEP * index);
+        point.x = offsetStart + OFFSET_STEP * index;
       });
 
       // 스캐터 점이 겹치지 않도록 추가 조정
@@ -84,8 +88,6 @@ function addOffsetToSameYValuesPerBar(scatterData, barYData) {
 
   return scatterData;
 }
-
-
 
 function calculateBarDataWithErrors(savedData, stdDevs) {
   const groupedData = savedData.reduce((acc, { x, y }) => {
@@ -123,11 +125,13 @@ function calculateStandardDeviation(datas) {
   function stdDev(arr) {
     if (arr.length === 0) return 0;
     const mean = arr.reduce((acc, val) => acc + val, 0) / arr.length;
-    const variance = arr.reduce((acc, val) => acc + Math.pow(val - mean, 2), 0) / (arr.length - 1);
+    const variance =
+      arr.reduce((acc, val) => acc + Math.pow(val - mean, 2), 0) /
+      (arr.length - 1);
     return Math.sqrt(variance);
   }
 
-  const stdDevs = arrayData.map(innerArray => stdDev(innerArray));
+  const stdDevs = arrayData.map((innerArray) => stdDev(innerArray));
 
   return stdDevs;
 }
@@ -141,9 +145,15 @@ export default function ScatterWithBars() {
   const Ytitle = location.state.Ytitle;
   const StandardDeviationWithSavedData = calculateStandardDeviation(savedData);
   // 에러가 적용된 barYData 생성
-  const barYData = calculateBarDataWithErrors(savedData, StandardDeviationWithSavedData);
+  const barYData = calculateBarDataWithErrors(
+    savedData,
+    StandardDeviationWithSavedData
+  );
   // 스캐터 데이터에 오프셋 추가
-  const adjustedScatterData = addOffsetToSameYValuesPerBar(scatterData, barYData);
+  const adjustedScatterData = addOffsetToSameYValuesPerBar(
+    scatterData,
+    barYData
+  );
 
   const data = {
     datasets: [
@@ -161,16 +171,17 @@ export default function ScatterWithBars() {
         backgroundColor: ["#8998fa", "#F69F91", "#A8E19B", "#FDB461"],
         borderColor: "#000000",
         borderWidth: 5,
-        barPercentage: 0.4,
+        barPercentage: 0.8,
         categoryPercentage: 0.8,
         errorBarWhiskerLineWidth: 2,
-        errorBarLineWidth:3,
-        errorBarWhiskerRatio: 0.45
+        errorBarLineWidth: 3,
+        errorBarWhiskerRatio: 0.45,
       },
     ],
   };
 
   const options = {
+    maintainAspectRatio: false, 
     scales: {
       x: {
         type: "linear",
@@ -234,5 +245,10 @@ export default function ScatterWithBars() {
     },
   };
 
-  return <Scatter data={data} options={options} />;
+  return (
+    <Scatter
+      data={data}
+      options={options}
+    />
+  );
 }
